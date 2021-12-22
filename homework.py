@@ -27,7 +27,10 @@ HOMEWORK_STATUSES = {
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s -- %(levelname)s -- %(message)s'    
+)
 
 
 def send_message(bot, message):
