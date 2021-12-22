@@ -1,0 +1,2 @@
+class EmptyHW(Exception):
+    pass
