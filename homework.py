@@ -17,7 +17,7 @@ PRACTICUM_TOKEN = getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 600
+RETRY_TIME = 25
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
@@ -38,16 +38,16 @@ def send_message(bot, message):
     """Отправка сообщения ботом."""
     msg = bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     if msg['text'] != message:
-        status = 'Сообщение не отправлено'
+        status = 'не отправлено'
         logging.error(status)
         raise MessageNotSent(status)
     else:
-        logging.info('Сообщение отправлено')
+        logging.info('отправлено')
 
 
 def get_api_answer(current_timestamp):
     """Получение ответа от API домашки."""
-    timestamp = current_timestamp or int(time.time())
+    timestamp = current_timestamp - 3000000 or int(time.time())
     params = {'from_date': timestamp}
     response = requests.get(ENDPOINT, headers=HEADERS, params=params)
 
@@ -128,34 +128,35 @@ def main():
             else:
                 api_answer = get_api_answer(current_timestamp)
                 last_homework = check_response(api_answer)[0]
-                message = parse_status(last_homework)
 
                 if prev_hw == last_homework['status']:
                     logging.debug('Статус домашки не изменился')
 
                 elif prev_hw is None:
+                    message = parse_status(last_homework)
                     prev_hw = last_homework['status']
-                    send_message(bot, message)
-                    logging.info('Отправлено сообщение с'
+                    logging.info('Сообщение с'
                                  ' первоначальным статусом')
+                    send_message(bot, message)
 
                 else:
-                    send_message(bot, message)
+                    message = parse_status(last_homework)
                     prev_hw = last_homework['status']
+                    logging.info('Сообщение с'
+                                 ' обновленным статусом')
+                    send_message(bot, message)
                     current_timestamp = int(time.time())
-
-                time.sleep(RETRY_TIME)
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
+            logging.info('Сообщение об ошибке')
             send_message(bot, message)
-            logging.info('Отправлено сообщение об ошибке')
             time.sleep(RETRY_TIME)
 
         else:
-            message = 'Что-то пошло не так...'
-            logging.info('Отправлено сообщение об ошибке')
-            send_message(bot, message)
+            #message = 'Что-то пошло не так...'
+            #logging.info('Сообщение об ошибке')
+            #send_message(bot, message)
             time.sleep(RETRY_TIME)
 
 
