@@ -33,7 +33,6 @@ logging.basicConfig(level=logging.INFO)
 def send_message(bot, message):
     """Отправка сообщения ботом."""
     msg = bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
-    print(msg)
     if msg['text'] != message:
         logging.error('Сообщение не отправлено')
     else:
