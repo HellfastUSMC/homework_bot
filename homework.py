@@ -47,7 +47,7 @@ def send_message(bot, message):
 
 def get_api_answer(current_timestamp):
     """Получение ответа от API домашки."""
-    timestamp = current_timestamp - 3000000 or int(time.time())
+    timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     response = requests.get(ENDPOINT, headers=HEADERS, params=params)
 
