@@ -32,3 +32,9 @@ class StatusUnknown(Exception):
     """Исключение при проверкe статуса в словаре."""
 
     pass
+
+
+class MessageNotSent(Exception):
+    """Исключение при неотправке сообщения."""
+
+    pass

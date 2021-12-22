@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from os import getenv
 
 from excepts import (ResponseEmptyHW, ResponseNotAListHW, TokenMissing,
-                     ResponseWrongStatus, ResponseUnknownError, StatusUnknown)
+                     ResponseWrongStatus, ResponseUnknownError,
+                     StatusUnknown, MessageNotSent)
 
 load_dotenv()
 
@@ -29,7 +30,7 @@ HOMEWORK_STATUSES = {
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s -- %(levelname)s -- %(message)s'    
+    format='%(asctime)s -- [%(levelname)s] -- %(message)s'
 )
 
 
@@ -37,7 +38,9 @@ def send_message(bot, message):
     """Отправка сообщения ботом."""
     msg = bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     if msg['text'] != message:
-        logging.error('Сообщение не отправлено')
+        status = 'Сообщение не отправлено'
+        logging.error(status)
+        raise MessageNotSent(status)
     else:
         logging.info('Сообщение отправлено')
 
