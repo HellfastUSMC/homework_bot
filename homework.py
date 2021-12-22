@@ -154,9 +154,6 @@ def main():
             time.sleep(RETRY_TIME)
 
         else:
-            #message = 'Что-то пошло не так...'
-            #logging.info('Сообщение об ошибке')
-            #send_message(bot, message)
             time.sleep(RETRY_TIME)
 
 
