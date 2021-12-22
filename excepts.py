@@ -23,6 +23,12 @@ class ResponseEmptyHW(Exception):
 
 
 class ResponseNotAListHW(Exception):
-    """Исключение при проверки что домашки не являются списком."""
+    """Исключение при проверкe что домашки не являются списком."""
+
+    pass
+
+
+class StatusUnknown(Exception):
+    """Исключение при проверкe статуса в словаре."""
 
     pass

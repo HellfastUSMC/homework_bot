@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from os import getenv
 
 from excepts import (ResponseEmptyHW, ResponseNotAListHW, TokenMissing,
-                     ResponseWrongStatus, ResponseUnknownError)
+                     ResponseWrongStatus, ResponseUnknownError, StatusUnknown)
 
 load_dotenv()
 
@@ -32,7 +32,11 @@ logging.basicConfig(level=logging.INFO)
 
 def send_message(bot, message):
     """Отправка сообщения ботом."""
-    bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+    msg = bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+    if msg != message:
+        logging.error('Сообщение не отправлено')
+    else:
+        logging.info('Сообщение отправлено')
 
 
 def get_api_answer(current_timestamp):
@@ -44,7 +48,7 @@ def get_api_answer(current_timestamp):
     if response.status_code != 200:
         code = response.status_code
         message = f'Код ответа { code } != 200'
-        logging.warning(message)
+        logging.error(message)
         raise ResponseWrongStatus(message)
 
     else:
@@ -56,12 +60,12 @@ def check_response(response):
     """Проверка полученного в get_api_answer() запроса."""
     if type(response['homeworks']) != list:
         message = 'Домашние работы не являются списком!'
-        logging.warning(message)
+        logging.error(message)
         raise ResponseNotAListHW(message)
 
     elif response['homeworks'] == []:
         message = 'Список работ пуст!'
-        logging.warning(message)
+        logging.error(message)
         raise ResponseEmptyHW(message)
 
     elif response['homeworks'] != []:
@@ -71,7 +75,7 @@ def check_response(response):
 
     else:
         message = 'Неизвестная ошибка запроса!'
-        logging.warning(message)
+        logging.error(message)
         raise ResponseUnknownError(message)
 
 
@@ -79,9 +83,14 @@ def parse_status(homework):
     """Сопоставление статуса из словаря и формирование сообщения в чат."""
     homework_name = homework['homework_name']
     homework_status = homework['status']
-    verdict = HOMEWORK_STATUSES[homework_status]
-    logging.info('Сформирован текст сообщения')
-    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
+    if homework_status not in HOMEWORK_STATUSES.keys():
+        message = 'Статус с таким обозначением не найден в словаре'
+        logging.error(message)
+        raise StatusUnknown(message)
+    else:
+        verdict = HOMEWORK_STATUSES[homework_status]
+        logging.info('Сформирован текст сообщения')
+        return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def check_tokens():
@@ -116,7 +125,7 @@ def main():
                 message = parse_status(last_homework)
 
                 if prev_hw == last_homework['status']:
-                    logging.info('Статус домашки не изменился')
+                    logging.debug('Статус домашки не изменился')
 
                 elif prev_hw is None:
                     prev_hw = last_homework['status']
