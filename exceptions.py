@@ -28,6 +28,24 @@ class ResponseNotAListHW(Exception):
     pass
 
 
+class ResponseNotAJSON(Exception):
+    """Исключение при проверкe что домашки не являются списком."""
+
+    pass
+
+
+class ResponseNotADict(Exception):
+    """Исключение при проверкe что домашки не являются списком."""
+
+    pass
+
+
+class ResponseMissingKeys(Exception):
+    """Исключение при проверкe что домашки не являются списком."""
+
+    pass
+
+
 class StatusUnknown(Exception):
     """Исключение при проверкe статуса в словаре."""
 
