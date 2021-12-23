@@ -9,9 +9,10 @@ from dotenv import load_dotenv
 from http import HTTPStatus
 from os import getenv, path
 
-from exceptions import (ResponseEmptyHW, ResponseNotAListHW, TokenMissing,
+from exceptions import (ResponseEmptyHW, TokenMissing,
                         ResponseWrongStatus, ResponseUnknownError,
-                        StatusUnknown, MessageNotSent, ResponseNotAJSON, ResponseNotADict, ResponseMissingKeys)
+                        StatusUnknown, MessageNotSent, ResponseNotAJSON,
+                        ResponseMissingKeys)
 
 load_dotenv()
 logging.config.fileConfig(
@@ -82,30 +83,30 @@ def get_api_answer(current_timestamp):
 def check_response(response):
     """Проверка полученного в get_api_answer() запроса."""
     logger = logging.getLogger('check_response')
-    if type(response) is not dict:
+    if not isinstance(response, dict):
         message = 'Запрос не является словарем!'
         logger.error(message)
-        raise ResponseNotADict(message)
+        raise TypeError(message)
+
+    elif not isinstance(response['homeworks'], list):
+        message = 'Домашние работы не являются списком!'
+        logger.error(message)
+        raise TypeError(message)
+
+    elif not response['homeworks']:
+        message = 'Список работ пуст!'
+        logger.error(message)
+        raise ResponseEmptyHW(message)
+
+    elif response['homeworks']:
+        homeworks = response['homeworks']
+        logger.info('Запрос проверен')
+        return homeworks
+
     else:
-        if type(response['homeworks']) is not list:
-            message = 'Домашние работы не являются списком!'
-            logger.error(message)
-            raise ResponseNotAListHW(message)
-
-        elif not response['homeworks']:
-            message = 'Список работ пуст!'
-            logger.error(message)
-            raise ResponseEmptyHW(message)
-
-        elif response['homeworks']:
-            homeworks = response['homeworks']
-            logger.info('Запрос проверен')
-            return homeworks
-
-        else:
-            message = 'Неизвестная ошибка запроса!'
-            logger.error(message)
-            raise ResponseUnknownError(message)
+        message = 'Неизвестная ошибка запроса!'
+        logger.error(message)
+        raise ResponseUnknownError(message)
 
 
 def parse_status(homework):
@@ -129,7 +130,8 @@ def parse_status(homework):
         else:
             verdict = HOMEWORK_STATUSES[homework_status]
             logger.info('Сформирован текст сообщения')
-            return f'Изменился статус проверки работы "{homework_name}". {verdict}'
+            return ('Изменился статус проверки работы'
+                    f' "{homework_name}". {verdict}')
 
 
 def check_tokens():
