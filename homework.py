@@ -12,7 +12,7 @@ from os import getenv, path
 from exceptions import (ResponseEmptyHW, TokenMissing,
                         ResponseWrongStatus, ResponseMissingHW,
                         StatusUnknown, MessageNotSent, ResponseNotAJSON,
-                        ResponseMissingKeys)
+                        ResponseMissingKeysVal)
 
 load_dotenv()
 logging.config.fileConfig(
@@ -86,15 +86,15 @@ def check_response(response):
         logger.error(message)
         raise TypeError(message)
 
-    elif not isinstance(response['homeworks'], list):
-        message = 'Домашние работы не являются списком!'
-        logger.error(message)
-        raise TypeError(message)
-
     elif 'homeworks' not in response:
         message = 'В ответе отсутствует ключ homeworks'
         logger.error(message)
         raise ResponseMissingHW(message)
+
+    elif not isinstance(response['homeworks'], list):
+        message = 'Домашние работы не являются списком!'
+        logger.error(message)
+        raise TypeError(message)
 
     elif not response['homeworks']:
         message = 'Список работ пуст!'
@@ -109,15 +109,16 @@ def check_response(response):
 
 def parse_status(homework):
     """Сопоставление статуса из словаря и формирование сообщения в чат."""
-    if (
-        not homework['homework_name'] or not homework['status']
-        or 'homework_name' not in homework
-        or 'status' not in homework
-    ):
-        message = ('В ответе отсутствуют ключи homework_name'
-                   ' или status, или они пусты')
+    if 'homework_name' not in homework or 'status' not in homework:
+        message = ('В ответе отсутствует ключ homework_name'
+                   ' или status')
         logger.error(message)
-        raise ResponseMissingKeys(message)
+        raise KeyError(message)
+    elif not homework['homework_name'] or not homework['status']:
+        message = ('В ответе пуст ключ homework_name'
+                   ' или status')
+        logger.error(message)
+        raise ResponseMissingKeysVal(message)
 
     else:
         homework_name = homework['homework_name']

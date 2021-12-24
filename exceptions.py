@@ -40,7 +40,7 @@ class ResponseNotADict(Exception):
     pass
 
 
-class ResponseMissingKeys(Exception):
+class ResponseMissingKeysVal(Exception):
     """Исключение при проверкe что домашки не являются списком."""
 
     pass
