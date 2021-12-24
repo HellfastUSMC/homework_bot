@@ -10,7 +10,7 @@ class ResponseWrongStatus(Exception):
     pass
 
 
-class ResponseUnknownError(Exception):
+class ResponseMissingHW(Exception):
     """Исключение для других ошибок запроса."""
 
     pass
