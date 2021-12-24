@@ -114,7 +114,8 @@ def parse_status(homework):
         or 'homework_name' not in homework
         or 'status' not in homework
     ):
-        message = 'В ответе отсутствуют ключи homework_name или status, или они пусты'
+        message = ('В ответе отсутствуют ключи homework_name'
+                   ' или status, или они пусты')
         logger.error(message)
         raise ResponseMissingKeys(message)
 
